@@ -1,0 +1,167 @@
+#!/usr/bin/bash 
+
+path="/home/a3/whoerconfigs"
+
+ukraine="${path}/Whoer_Ukraine_ua.ovpn"
+usa="${path}/Whoer_USA_us.ovpn"
+uk="${path}/Whoer_UK_gb.ovpn"
+turkey="${path}/Whoer_Turkey_tr.ovpn"
+thailand=${path}"/Whoer_Thailand_th.ovpn"
+switzerland=${path}"/Whoer_Switzerland_ch.ovpn"
+sweden=${path}"/Whoer_Sweden_se.ovpn"
+spain="${path}/Whoer_Spain_es.ovpn"
+southkorea="/${path}Whoer_SouthKorea_kr.ovpn"
+russia="${path}/Whoer_Russia_ru.ovpn"
+romania="${path}/Whoer_Romania_ro.ovpn"
+poland="${path}/Whoer_Poland_pl.ovpn"
+netherlands="${path}/Whoer_Netherlands_nl.ovpn"
+latvia="${path}/Whoer_Latvia_lv.ovpn"
+japan="${path}/Whoer_Japan_jp.ovpn"
+italy="${path}/Whoer_Italy_it.ovpn"
+germany="${path}/Whoer_Germany_de.ovpn"
+france="${path}/Whoer_France_fr.ovpn"
+china="${path}/Whoer_China_hk.ovpn"
+canada="${path}/Whoer_Canada_ca.ovpn"
+
+
+if [ ! -d "$path" ]; then
+	echo "Не верный путь к директори"
+	exit 1 
+fi
+
+if ! which openvpn &> /dev/null; then
+	echo "openvpn не найден, начинается установка.."
+	sudo apt-get install openvpn -y
+	if [ "$?" -eq 0 ]; then
+		echo "Установка openvpn завершена успешно"
+	else
+		echo "Ошибка при установке, Вы можете установить openvpn вручную"
+	fi
+fi
+
+kill_openvpn() {
+	echo "try kill 15"
+	sudo pkill -15 openvpn
+	sleep 5
+	if pgrep -x "openvpn" > /dev/null
+	then
+		echo "try kill 9"
+		sudo pkill -9 openvpn
+	fi
+}
+
+
+run_vpn() {
+	kill_openvpn
+	sleep 0.3
+	sudo openvpn --config "$1" --daemon 
+	sleep 6 
+	result="$?"
+	current_ip=$(curl -s https://ipinfo.io/ip)
+	if [ "$result" -eq 0 ]; then
+		echo "Соединение установленно успешно. Ваш IP: "$current_ip""
+	else
+		echo "Ошибка, соединение неустановленно. Ваш IP: "$current_ip""
+	fi
+
+}
+
+
+
+
+case "$1" in
+	-ua | -ukraine)
+		run_vpn "$ukraine"
+		;;
+	-us | -usa)
+		run_vpn "$usa"
+		;;
+	-gb | -uk)
+		run_vpn "$uk"
+		;;
+	-tr | -turkey)
+		run_vpn "$turkey"
+		;;
+	-th | -thailand)
+		run_vpn "$thailand"
+		;;
+	-ch | -switzerland)
+		run_vpn "$switzerland"
+		;;
+	-se | -sweden)
+		run_vpn "$sweden"
+		;;
+	-es | -spain)
+		run_vpn "$spain"
+		;;
+	-kr | -southkorea)
+		run_vpn "$southkorea"
+		;;
+	-ru | -russia)
+		run_vpn "$russia"
+		;;
+	-ro | -romania)
+		run_vpn "$romania"
+		;;
+	-pl | -poland)
+		run_vpn "$poland"
+		;;
+	-nl | -netherlands)
+		run_vpn "$netherlands"
+		;;
+	-lv | -latvia)
+		run_vpn "$latvia"
+		;;
+	-jp | -japan)
+		run_vpn "$japan"
+		;;
+	-it | -italy)
+		run_vpn "$italy"
+		;;
+	-de | -germany)
+		run_vpn "$germany"
+		;;
+	-fr | -france)
+		run_vpn "$france"
+		;;
+	-hk | -china)
+		run_vpn "$china"
+		;;
+	-ca | -canada)
+		run_vpn "$canada"
+		;;
+
+
+-h | --help)
+    echo "-ua | -ukraine"
+    echo "-us | -usa"
+    echo "-gb | -uk"
+    echo "-tr | -turkey"
+    echo "-th | -thailand"
+    echo "-ch | -switzerland"
+    echo "-se | -sweden"
+    echo "-es | -spain"
+    echo "-kr | -southkorea"
+    echo "-ru | -russia"
+    echo "-ro | -romania"
+    echo "-pl | -poland"
+    echo "-nl | -netherlands"
+    echo "-lv | -latvia"
+    echo "-jp | -japan"
+    echo "-it | -italy"
+    echo "-de | -germany"
+    echo "-fr | -france"
+    echo "-hk | -china"
+    echo "-ca | -canada"
+    ;;
+
+
+	-k | --kill)
+		kill_openvpn	
+		sleep 0.3
+		current_ip=$(curl -s https://ipinfo.io/ip)
+		echo "vpn отключен, ваш текущий IP: $current_ip"
+		;;
+	esac
+
+
